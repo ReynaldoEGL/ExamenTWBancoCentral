@@ -1,0 +1,7 @@
+// Agregue este bloque dentro del array que devuelve config/services.php.
+// No reemplace los demás servicios existentes.
+'supabase' => [
+    'url' => env('SUPABASE_URL'),
+    // Use la clave pública/anon del proyecto. Nunca use service_role aquí.
+    'key' => env('SUPABASE_PUBLIC_KEY'),
+],

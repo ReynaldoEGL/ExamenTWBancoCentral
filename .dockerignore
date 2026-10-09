@@ -1,0 +1,10 @@
+# Nunca incluya secretos locales ni archivos innecesarios en la imagen.
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+node_modules
+vendor
+storage/logs/*
+.DS_Store
