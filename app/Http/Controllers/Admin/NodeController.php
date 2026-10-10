@@ -61,40 +61,52 @@ class NodeController extends Controller
             return back()->withErrors(['responsable_id' => 'Ese ejecutivo ya está asociado a una sucursal.'])->withInput();
         }
 
-        $id = (string) Str::uuid();
-        $initialCash = Money::fromCents(Money::toCents($data['efectivo_inicial']));
+        $initialCash = Money::fromCents(
+            Money::toCents($data['efectivo_inicial'])
+        );
 
-        DB::transaction(function () use ($data, $profile, $id, $initialCash, $request) {
-            DB::table('nodes')->insert([
-                'id' => $id,
-                'tipo' => $data['tipo'],
-                'nombre' => trim($data['nombre']),
-                'ubicacion' => $data['ubicacion'] ?? null,
-                'responsable_nombre' => $profile->nombre,
-                'responsable_contacto' => $data['responsable_contacto'] ?? null,
-                'responsable_id' => $profile->id,
-                'efectivo_disponible' => $initialCash,
-                'activo' => true,
+    $id = DB::transaction(function () use (
+        $data,
+        $profile,
+        $initialCash,
+        $request
+    ) {
+        // PostgreSQL genera el ID bigint del nodo.
+        $id = (string) DB::table('nodes')->insertGetId([
+            'tipo' => $data['tipo'],
+            'nombre' => trim($data['nombre']),
+            'ubicacion' => $data['ubicacion'] ?? null,
+            'responsable_nombre' => $profile->nombre,
+            'responsable_contacto' => $data['responsable_contacto'] ?? null,
+            'responsable_id' => $profile->id,
+            'efectivo_disponible' => $initialCash,
+            'activo' => true,
+        ], 'id');
+
+        // La sucursal puede vincular al ejecutivo con el nodo.
+        if ($data['tipo'] === 'sucursal' && $profile->rol === 'ejecutivo') {
+            DB::table('profiles')
+                ->where('id', $profile->id)
+                ->update(['node_id' => $id]);
+        }
+
+        // Registrar la asignación inicial de efectivo en la auditoría.
+        if (Money::toCents($initialCash) > 0) {
+            DB::table('node_cash_movements')->insert([
+                'node_id' => $id,
+                'monto' => $initialCash,
+                'tipo' => 'ingreso',
+                'motivo' => 'Asignación inicial al crear el nodo',
+                'admin_id' => $request->session()->get('central_admin_id'),
             ]);
+        }
 
-            // profiles.node_id identifica la sucursal del ejecutivo.
-            if ($data['tipo'] === 'sucursal' && $profile->rol === 'ejecutivo') {
-                DB::table('profiles')->where('id', $profile->id)->update(['node_id' => $id]);
-            }
+    return $id;
+});
 
-            // La dispersión inicial también queda auditada; monto debe ser > 0.
-            if (Money::toCents($initialCash) > 0) {
-                DB::table('node_cash_movements')->insert([
-                    'node_id' => $id,
-                    'monto' => $initialCash,
-                    'tipo' => 'ingreso',
-                    'motivo' => 'Asignación inicial al crear el nodo',
-                    'admin_id' => $request->session()->get('central_admin_id'),
-                ]);
-            }
-        });
-
-        return redirect()->route('admin.nodes.show', $id)->with('success', 'Nodo creado. Genere su API Key y guárdela de forma segura.');
+return redirect()
+    ->route('admin.nodes.show', $id)
+    ->with('success', 'Nodo creado. Genere su API Key y guárdela de forma segura.');
     }
 
     public function show(string $nodeId)

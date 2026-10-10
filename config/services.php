@@ -36,10 +36,16 @@ return [
     ],
 
     //configuración de supabase
+    
     'supabase' => [
-    'url'         => env('SUPABASE_URL'),
-    'anon_key'    => env('SUPABASE_ANON_KEY'),
-    'service_key' => env('SUPABASE_SERVICE_KEY'),
+        'url' => env('SUPABASE_URL'),
+        // Lo consulta el controlador de login del panel.
+        'key' => env('SUPABASE_PUBLIC_KEY', env('SUPABASE_ANON_KEY')),
+        // Se conserva para código que utilice el nombre anterior.
+        'anon_key' => env('SUPABASE_ANON_KEY', env('SUPABASE_PUBLIC_KEY')),
+        // No es necesaria para el login del panel.
+        'service_key' => env('SUPABASE_SERVICE_KEY'),
     ],
+
 
 ];
