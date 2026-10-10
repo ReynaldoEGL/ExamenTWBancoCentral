@@ -1,7 +1,7 @@
 @extends('layouts.central')
 @section('title', 'Resumen')
 @section('content')
-<div class="page-heading"><div><p class="eyebrow">VISTA GENERAL</p><h1>Resumen del Banco Central</h1><p class="muted">Datos consultados de la base central de Supabase.</p></div><a class="button button-primary" href="{{ route('admin.nodes.create') }}">+ Registrar nodo</a></div>
+<div class="page-heading"><div><p class="eyebrow">VISTA GENERAL</p><h1>Resumen del Banco Central</h1></div><a class="button button-primary" href="{{ route('admin.nodes.create') }}">+ Registrar nodo</a></div>
 <div class="metric-grid">
     <div class="metric"><span>Sucursales</span><strong>{{ number_format($counts['sucursales']) }}</strong></div>
     <div class="metric"><span>Cajeros</span><strong>{{ number_format($counts['cajeros']) }}</strong></div>

@@ -29,6 +29,6 @@
     @endif
     @yield('content')
 </main>
-<footer class="footer">Sistema Bancario Distribuido · Banco Central</footer>
+<footer class="footer">Sistema Bancario</footer>
 </body>
 </html>
