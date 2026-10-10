@@ -62,8 +62,8 @@ class NodeController extends Controller
         }
 
         $initialCash = Money::fromCents(
-    Money::toCents($data['efectivo_inicial'])
-);
+            Money::toCents($data['efectivo_inicial'])
+        );
 
     $id = DB::transaction(function () use (
         $data,
