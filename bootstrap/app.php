@@ -14,6 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         //
+        $middleware->alias([
+        'api.key' => \App\Http\Middleware\ApiKeyAuth::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
     $exceptions->shouldRenderJsonWhen(fn ($request) => $request->is('api/*'));
