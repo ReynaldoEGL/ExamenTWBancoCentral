@@ -14,7 +14,7 @@ class TransactionController extends Controller
         $filters = $request->validate([
             'q' => ['nullable', 'string', 'max:100'],
             'tipo' => ['nullable', Rule::in(['retiro', 'deposito', 'transferencia'])],
-            'node_id' => ['nullable', 'uuid', 'exists:nodes,id'],
+            'node_id' => ['nullable', 'integer', 'min:1', 'exists:nodes,id'],
             'desde' => ['nullable', 'date_format:Y-m-d'],
             'hasta' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:desde'],
         ]);

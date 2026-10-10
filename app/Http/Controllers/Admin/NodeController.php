@@ -151,7 +151,7 @@ return redirect()
         if (! $profile) {
             return back()->withErrors(['responsable_id' => 'El responsable seleccionado no existe.'])->withInput();
         }
-        if ($node->tipo === 'sucursal' && $profile->rol === 'ejecutivo' && $profile->node_id !== null && $profile->node_id !== $nodeId) {
+        if ($node->tipo === 'sucursal' && $profile->rol === 'ejecutivo' && $profile->node_id !== null && (string) $profile->node_id !== (string) $nodeId) {
             return back()->withErrors(['responsable_id' => 'Ese ejecutivo ya está asociado a otra sucursal.'])->withInput();
         }
 
@@ -167,7 +167,7 @@ return redirect()
 
             if ($node->tipo === 'sucursal' && $node->responsable_id !== $profile->id) {
                 $previous = DB::table('profiles')->where('id', $node->responsable_id)->first();
-                if ($previous && $previous->rol === 'ejecutivo' && $previous->node_id === $nodeId) {
+                if ($previous && $previous->rol === 'ejecutivo' && $previous->node_id !== null && (string) $previous->node_id === (string) $nodeId) {
                     DB::table('profiles')->where('id', $previous->id)->update(['node_id' => null]);
                 }
                 if ($profile->rol === 'ejecutivo') {
